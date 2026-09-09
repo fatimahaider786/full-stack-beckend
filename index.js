@@ -1,34 +1,38 @@
-require('dotenv').config()
-const express = require('express')
-const app = express()
-const cors = require('cors')
-const port = process.env.PORT
-const connectDB = require('./db/connect')
+const express = require('express');
+const cors = require('cors');
+const path = require('path');
+require('dotenv').config();
+
+const connectDB = require('./db/connect');
+const userRoutes = require('./routes/users');
+const productRoutes = require('./routes/product');
+
+const app = express();
+const PORT = process.env.PORT || 5000;
+
+// Middleware
+app.use(cors());
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// Serve the uploads folder properly (Absolute Path)
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
+// Routes Mounting
+app.use('/api/v1/users', userRoutes);
+app.use('/api/v1/products', productRoutes);
+
+// Database Connection & Server Start
 connectDB()
-const productRouter = require('./routes/product')
-const userRouter = require('./routes/users')
-
-
-app.use(cors({origin: process.env.FRONTEND_URL}))
-app.use(express.json())
-app.use('/api/v1', productRouter)
-app.use('/api/v1/users', userRouter)
-
-app.get('/health', (req, res)=>{
-    try {
-        res.status(200).json({
-            success:true,
-            msg:"Health is fine"
-        })
-    } catch (error) {
-        res.status(500).json({
-            success:false,
-            msg:"Internal Server Error",
-            error
-        })
+  .then(() => {
+    if (process.env.NODE_ENV !== 'production') {
+      app.listen(PORT, () => {
+        console.log(`Server is up and listening on port ${PORT}`);
+      });
     }
-})
+  })
+  .catch((error) => {
+    console.error('DB Connection Error:', error);
+  });
 
-app.listen(port, ()=>{
-    console.log(`Server is up and listening on port ${port}`)
-})
+module.exports = app;
