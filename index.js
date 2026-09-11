@@ -1,38 +1,31 @@
-const express = require('express');
-const cors = require('cors');
-const path = require('path');
-require('dotenv').config();
-
-const connectDB = require('./db/connect');
-const userRoutes = require('./routes/users');
-const productRoutes = require('./routes/product');
+require("dotenv").config();
+const express = require("express");
+const cors = require("cors");
+const connectDB = require("./db/connect");
+const productRoutes = require("./routes/product");
+const userRoutes = require("./routes/users");
 
 const app = express();
-const PORT = process.env.PORT || 5000;
+const port = process.env.PORT || 5000;
 
-// Middleware
-app.use(cors());
+// CORS ko hamesha routes se pehle likhna hai
+app.use(cors({
+  origin: "*",
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
+  credentials: true
+}));
+
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
 
-// Serve the uploads folder properly (Absolute Path)
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+// Routes
+app.use("/api/v1", productRoutes);
+app.use("/api/v1/users", userRoutes);
 
-// Routes Mounting
-app.use('/api/v1/users', userRoutes);
-app.use('/api/v1/products', productRoutes);
+app.get("/health", (req, res) => {
+  res.status(200).json({ success: true, message: "Server is healthy" });
+});
 
-// Database Connection & Server Start
-connectDB()
-  .then(() => {
-    if (process.env.NODE_ENV !== 'production') {
-      app.listen(PORT, () => {
-        console.log(`Server is up and listening on port ${PORT}`);
-      });
-    }
-  })
-  .catch((error) => {
-    console.error('DB Connection Error:', error);
-  });
-
-module.exports = app;
+connectDB();
+app.listen(port, () => {
+  console.log(`Server is up and listening on port ${port}`);
+});
