@@ -1,4 +1,4 @@
-// backend/index.js
+
 require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
@@ -7,7 +7,6 @@ const productRoutes = require("./routes/product");
 const userRoutes = require("./routes/users");
 
 const app = express();
-const port = process.env.PORT || 5000;
 
 app.use(cors({
   origin: "*", 
@@ -17,11 +16,10 @@ app.use(cors({
 }));
 
 app.options("*", cors());
-
 app.use(express.json());
 
 // Routes
-app.use("/api/v1", productRoutes);
+app.use("/api/v1/products", productRoutes);
 app.use("/api/v1/users", userRoutes);
 
 app.get("/health", (req, res) => {
@@ -30,6 +28,12 @@ app.get("/health", (req, res) => {
 
 connectDB();
 
-app.listen(port, () => {
-  console.log(`Server is up and listening on port ${port}`);
-});
+
+if (process.env.NODE_ENV !== 'production') {
+  const port = process.env.PORT || 5000;
+  app.listen(port, () => {
+    console.log(`Server is listening on port ${port}`);
+  });
+}
+
+module.exports = app;
