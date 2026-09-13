@@ -1,4 +1,3 @@
-
 require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
@@ -7,7 +6,9 @@ const productRoutes = require("./routes/product");
 const userRoutes = require("./routes/users");
 
 const app = express();
+const port = process.env.PORT || 5000;
 
+// CORS configuration (yeh khud options/preflight handle kar leta hai)
 app.use(cors({
   origin: "*", 
   methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
@@ -15,7 +16,6 @@ app.use(cors({
   credentials: true
 }));
 
-app.options("*", cors());
 app.use(express.json());
 
 // Routes
@@ -28,9 +28,7 @@ app.get("/health", (req, res) => {
 
 connectDB();
 
-
 if (process.env.NODE_ENV !== 'production') {
-  const port = process.env.PORT || 5000;
   app.listen(port, () => {
     console.log(`Server is listening on port ${port}`);
   });
