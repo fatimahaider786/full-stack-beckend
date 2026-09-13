@@ -22,6 +22,11 @@ app.use(express.json());
 app.use("/api/v1/products", productRoutes);
 app.use("/api/v1/users", userRoutes);
 
+// Root route added
+app.get("/", (req, res) => {
+  res.status(200).json({ success: true, message: "Backend API is running successfully!" });
+});
+
 app.get("/health", (req, res) => {
   res.status(200).json({ success: true, message: "Server is healthy" });
 });
@@ -33,5 +38,4 @@ if (process.env.NODE_ENV !== 'production') {
     console.log(`Server is listening on port ${port}`);
   });
 }
-
 module.exports = app;
