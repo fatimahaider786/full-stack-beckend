@@ -8,11 +8,7 @@ const connectDB = async () => {
   }
 
   try {
-    const opts = {
-      bufferCommands: false,
-    };
-
-    cachedConnection = await mongoose.connect(process.env.MONGO_URI, opts);
+    cachedConnection = await mongoose.connect(process.env.MONGO_URI);
     console.log("DB CONNECT SUCCESSFULLY");
     return cachedConnection;
   } catch (error) {
